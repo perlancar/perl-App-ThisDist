@@ -91,7 +91,7 @@ if (defined $dist) {
  % _
 
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This script tries these methods when guessing Perl distribution name associated
 with current directory:
@@ -105,3 +105,14 @@ with current directory:
 =item * L<CPAN::Dist::FromRepoName> against current directory name
 
 =back
+
+
+=head1 FAQ
+
+=head2 Where is this-mod?
+
+For now you can use L<dist2mod>:
+
+ % this-dist | dist2mod
+
+    
