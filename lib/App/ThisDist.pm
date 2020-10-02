@@ -6,7 +6,7 @@ package App::ThisDist;
 # VERSION
 
 1;
-# ABSTRACT: This CPAN {distribution,module,author,...}
+# ABSTRACT: Print Perl {distribution,module,author,...} associated with current directory
 
 =head1 SEE ALSO
 
