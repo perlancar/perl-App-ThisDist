@@ -1,0 +1,71 @@
+#!perl
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+use strict;
+use warnings;
+use Cwd 'getcwd';
+
+my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
+my $cwd = getcwd();
+(my $cwd_basename = $cwd) =~ s!.+[/\\]!!;
+
+my $dist;
+GUESS: {
+  FROM_REPO_NAME: {
+        require CPAN::Dist::FromRepoName;
+        my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($cwd_basename);
+        if (defined $res) {
+            $dist = $res;
+            last GUESS;
+        }
+    }
+}
+
+if (defined $dist) {
+    print $dist, "\n";
+} else {
+    if ($quiet) {
+    } else {
+        warn "this-dist: No perl distribution name can be associated with current directory '$cwd'\n";
+    }
+    exit 1;
+}
+
+# ABSTRACT: Return name of Perl distribution associated with the current directory
+# PODNAME:
+
+=head1 SYNOPSIS
+
+ % pwd
+ /home/budi/perl-Foo-Bar
+
+ % this-dist
+ Foo-Bar
+
+ % cd /
+ % this-dist
+ this-dist: No perl distribution name can be associated with current directory '/'
+
+ % this-dist -q
+
+ % _
+
+
+=head2 DESCRIPTION
+
+This script tries these methods when guessing Perl distribution name associated
+with current directory:
+
+=over
+
+=item * (TODO) Name in F<dist.ini>, if the file is available
+
+=item * (TODO) L<CPAN::Info::FromURL> against URL in F<.git/config>, the file is available
+
+=item * L<CPAN::Dist::FromRepoName> against current directory name
+
+=back
