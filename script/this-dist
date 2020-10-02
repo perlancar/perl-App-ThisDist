@@ -5,21 +5,53 @@
 # DIST
 # VERSION
 
+use 5.010001;
 use strict;
 use warnings;
-use Cwd 'getcwd';
 
+use Cwd 'getcwd';
+use File::Slurper 'read_text';
+
+my $debug = $ENV{DEBUG};
 my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
 my $cwd = getcwd();
 (my $cwd_basename = $cwd) =~ s!.+[/\\]!!;
 
 my $dist;
 GUESS: {
+  FROM_DIST_INI: {
+        if (-f "dist.ini") {
+            my $ct = read_text "dist.ini";
+            while ($ct =~ /^\s*name\s*=\s*(.+)/mg) {
+                $dist = $1;
+                warn "this-dist: Guessed dist=$dist from dist.ini\n" if $debug;
+                last GUESS;
+            }
+        }
+    }
+
+  FROM_GIT_CONFIG: {
+        if (-f ".git/config") {
+            my $ct = read_text ".git/config";
+            while ($ct =~ /^\s*url\s*=\s*(.+)/mg) {
+                my $url = $1;
+                warn "this-dist: Found URL '$url'\n" if $debug;
+                require CPAN::Dist::FromURL;
+                my $res = CPAN::Dist::FromURL::extract_cpan_dist_from_url($url);
+                if (defined $dist) {
+                    warn "this-dist: Guessed dist=$dist from .git/config URL '$url'\n" if $debug;
+                    last GUESS;
+                }
+            }
+        }
+    }
+
   FROM_REPO_NAME: {
         require CPAN::Dist::FromRepoName;
         my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($cwd_basename);
         if (defined $res) {
             $dist = $res;
+            warn "this-dist: Guessed dist=$dist from repo name '$cwd_basename'\n" if $debug;
             last GUESS;
         }
     }
@@ -46,10 +78,14 @@ if (defined $dist) {
  % this-dist
  Foo-Bar
 
+ # See how distribution is guessed
+ % DEBUG=1 this-dist
+
  % cd /
  % this-dist
  this-dist: No perl distribution name can be associated with current directory '/'
 
+ # Don't show error message when guessing is failed
  % this-dist -q
 
  % _
@@ -62,9 +98,9 @@ with current directory:
 
 =over
 
-=item * (TODO) Name in F<dist.ini>, if the file is available
+=item * Name in F<dist.ini>, if the file is available
 
-=item * (TODO) L<CPAN::Info::FromURL> against URL in F<.git/config>, the file is available
+=item * L<CPAN::Info::FromURL> against URL in F<.git/config>, the file is available
 
 =item * L<CPAN::Dist::FromRepoName> against current directory name
 
