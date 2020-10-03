@@ -80,15 +80,22 @@ if (defined $dist) {
 
  # See how distribution is guessed
  % DEBUG=1 this-dist
+ this-dist: Guessed dist=App-PPIUtils from dist.ini
+ Foo-Bar
 
+ # Will exit with code 1 and print error message to stderr when dist cannot be guessed
  % cd /
  % this-dist
  this-dist: No perl distribution name can be associated with current directory '/'
 
- # Don't show error message when guessing is failed
+ # Don't show error message when guessing is failed (just exit with code 1)
  % this-dist -q
-
  % _
+
+Some recipes:
+
+ # Show metacpan distribution page in browser (requires L<lcpan> from L<App::lcpan>)
+ % lcpan metacpan-dist `this-dist`
 
 
 =head1 DESCRIPTION
@@ -98,9 +105,9 @@ with current directory:
 
 =over
 
-=item * Name in F<dist.ini>, if the file is available
+=item * Name in F<dist.ini> (L<Dist::Zilla> configuration file), if the file is available
 
-=item * L<CPAN::Info::FromURL> against URL in F<.git/config>, the file is available
+=item * L<CPAN::Info::FromURL> against URLs in F<.git/config> (git repository configuration file), if the file is available
 
 =item * L<CPAN::Dist::FromRepoName> against current directory name
 
@@ -114,5 +121,3 @@ with current directory:
 For now you can use L<dist2mod>:
 
  % this-dist | dist2mod
-
-    

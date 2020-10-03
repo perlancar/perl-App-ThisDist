@@ -13,3 +13,8 @@ package App::ThisDist;
 See included scripts:
 
 # INSERT_EXECS_LIST
+
+
+=head1 SEE ALSO
+
+L<App::DistUtils>
