@@ -8,7 +8,7 @@ package App::ThisDist;
 1;
 # ABSTRACT: Print Perl {distribution,module,author,...} associated with current directory
 
-=head1 SEE ALSO
+=head1 DESCRIPTION
 
 See included scripts:
 
