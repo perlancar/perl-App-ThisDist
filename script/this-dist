@@ -8,54 +8,14 @@
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger::Screen;
 
-use Cwd 'getcwd';
-use File::Slurper 'read_text';
+use App::ThisDist 'this_dist';
+use Cwd;
 
-my $debug = $ENV{DEBUG};
-my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
 my $cwd = getcwd();
-(my $cwd_basename = $cwd) =~ s!.+[/\\]!!;
-
-my $dist;
-GUESS: {
-  FROM_DIST_INI: {
-        if (-f "dist.ini") {
-            my $ct = read_text "dist.ini";
-            while ($ct =~ /^\s*name\s*=\s*(.+)/mg) {
-                $dist = $1;
-                warn "this-dist: Guessed dist=$dist from dist.ini\n" if $debug;
-                last GUESS;
-            }
-        }
-    }
-
-  FROM_GIT_CONFIG: {
-        if (-f ".git/config") {
-            my $ct = read_text ".git/config";
-            while ($ct =~ /^\s*url\s*=\s*(.+)/mg) {
-                my $url = $1;
-                warn "this-dist: Found URL '$url'\n" if $debug;
-                require CPAN::Dist::FromURL;
-                my $res = CPAN::Dist::FromURL::extract_cpan_dist_from_url($url);
-                if (defined $dist) {
-                    warn "this-dist: Guessed dist=$dist from .git/config URL '$url'\n" if $debug;
-                    last GUESS;
-                }
-            }
-        }
-    }
-
-  FROM_REPO_NAME: {
-        require CPAN::Dist::FromRepoName;
-        my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($cwd_basename);
-        if (defined $res) {
-            $dist = $res;
-            warn "this-dist: Guessed dist=$dist from repo name '$cwd_basename'\n" if $debug;
-            last GUESS;
-        }
-    }
-}
+my $dist = this_dist($cwd);
+my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
 
 if (defined $dist) {
     print $dist, "\n";
