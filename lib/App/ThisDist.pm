@@ -17,28 +17,34 @@ our @EXPORT_OK = qw(this_dist);
 sub this_dist {
     require File::Slurper;
 
-    my ($dir) = @_;
+    my ($dir, $extract_version) = @_;
 
-    if (!$dir) {
+    if (defined $dir) {
+        log_debug "chdir to $dir ...";
+    }
+
+    local $CWD = $dir if defined $dir;
+
+    unless (defined $dir) {
         require Cwd;
         $dir = Cwd::getcwd();
     }
+
     (my $dir_basename = $dir) =~ s!.+[/\\]!!;
 
-    local $CWD = $dir;
+    my ($distname, $distver);
 
-    my $dist;
   GUESS: {
       FROM_DISTMETA_2: {
             for my $file ("MYMETA.json", "META.json") {
                 next unless -f $file;
-                log_debug "Found distribution metadata $file in current directory";
+                log_debug "Found distribution metadata $file";
                 require JSON::PP;
                 my $content = File::Slurper::read_text($file);
                 my $meta = JSON::PP::decode_json($content);
                 if ($meta && ref $meta eq 'HASH' && defined $meta->{name}) {
-                    $dist = $meta->{name};
-                    log_debug "Got dist=$dist from distribution metadata $file";
+                    $distname = $meta->{name};
+                    log_debug "Got distname=$distname from distribution metadata $file";
                     last GUESS;
                 } else {
                     last;
@@ -49,12 +55,12 @@ sub this_dist {
       FROM_DISTMETA_1_1: {
             for my $file ("MYMETA.yml", "META.yml") {
                 next unless -f $file;
-                log_debug "Found distribution metadata $file in current directory";
+                log_debug "Found distribution metadata $file";
                 require YAML::XS;
                 my $meta = YAML::XS::LoadFile($file);
                 if ($meta && ref $meta eq 'HASH' && defined $meta->{name}) {
-                    $dist = $meta->{name};
-                    log_debug "Got dist=$dist from distribution metadata $file";
+                    $distname = $meta->{name};
+                    log_debug "Got distname=$distname from distribution metadata $file";
                     last GUESS;
                 } else {
                     last;
@@ -64,18 +70,18 @@ sub this_dist {
 
       FROM_DIST_INI: {
             last unless -f "dist.ini";
-            log_debug "Found dist.ini in current directory";
+            log_debug "Found dist.ini";
             my $content = File::Slurper::read_text("dist.ini");
             while ($content =~ /^\s*name\s*=\s*(.+)/mg) {
-                $dist = $1;
-                log_debug "Got dist=$dist from dist.ini";
+                $distname = $1;
+                log_debug "Got distname=$distname from dist.ini";
                 last GUESS;
             }
         }
 
       FROM_MAKEFILE_PL: {
             last unless -f "Makefile.PL";
-            log_debug "Found Makefile.PL in current directory";
+            log_debug "Found Makefile.PL";
             my $content = File::Slurper::read_text("Makefile.PL");
             unless ($content =~ /use ExtUtils::MakeMaker/) {
                 log_debug "Makefile.PL doesn't seem to use ExtUtils::MakeMaker, skipped";
@@ -85,14 +91,14 @@ sub this_dist {
                 log_debug "Couldn't extract value of DISTNAME from Makefile.PL, skipped";
                 last;
             }
-            $dist = $1;
-            log_debug "Got dist=$dist from Makefile.PL";
+            $distname = $1;
+            log_debug "Got distname=$distname from Makefile.PL";
             last GUESS;
         }
 
       FROM_MAKEFILE: {
             last unless -f "Makefile";
-            log_debug "Found Makefile in current directory";
+            log_debug "Found Makefile";
             my $content = File::Slurper::read_text("Makefile");
             unless ($content =~ /by MakeMaker/) {
                 log_debug "Makefile doesn't seem to be generated from MakeMaker.PL, skipped";
@@ -102,14 +108,14 @@ sub this_dist {
                 log_debug "Couldn't extract value of DISTNAME from Makefile, skipped";
                 last;
             }
-            $dist = $1;
-            log_debug "Got dist=$dist from Makefile.PL";
+            $distname = $1;
+            log_debug "Got distname=$distname from Makefile.PL";
             last GUESS;
         }
 
       FROM_BUILD_PL: {
             last unless -f "Build.PL";
-            log_debug "Found Build.PL in current directory";
+            log_debug "Found Build.PL";
             my $content = File::Slurper::read_text("Build.PL");
             unless ($content =~ /use Module::Build/) {
                 log_debug "Build.PL doesn't seem to use Module::Build, skipped";
@@ -119,8 +125,8 @@ sub this_dist {
                 log_debug "Couldn't extract value of module_name from Build.PL, skipped";
                 last;
             }
-            $dist = $1; $dist =~ s/::/-/g;
-            log_debug "Got dist=$dist from Build.PL";
+            $distname = $1; $distname =~ s/::/-/g;
+            log_debug "Got distname=$distname from Build.PL";
             last GUESS;
         }
 
@@ -135,8 +141,8 @@ sub this_dist {
                 log_debug "Found URL '$url' in git config";
                 require CPAN::Dist::FromURL;
                 my $res = CPAN::Dist::FromURL::extract_cpan_dist_from_url($url);
-                if (defined $dist) {
-                    log_debug "Guessed dist=$dist from .git/config URL '$url'";
+                if (defined $distname) {
+                    log_debug "Guessed distname=$distname from .git/config URL '$url'";
                     last GUESS;
                 }
             }
@@ -147,15 +153,15 @@ sub this_dist {
             require CPAN::Dist::FromRepoName;
             my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($dir_basename);
             if (defined $res) {
-                $dist = $res;
-                log_debug "Guessed dist=$dist from repo name '$dir_basename'";
+                $distname = $res;
+                log_debug "Guessed distname=$distname from repo name '$dir_basename'";
                 last GUESS;
             }
         }
 
-        log_debug "Can't guess this distribution, giving up";
+        log_debug "Can't guess distribution, giving up";
     }
-    $dist;
+    $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
 }
 
 1;
@@ -171,6 +177,14 @@ See included scripts:
 =head1 FUNCTIONS
 
 =head2 this_dist
+
+Usage:
+
+ my $dist = this_dist([ $dir ] [ , $extract_version? ]); => e.g. "App-Foo" or "App-Foo 1.23"
+
+If C<$dir> is not specified, will default to current directory. If
+C<$extract_version> is set to true, will also try to extract distribution
+version and will return "?" when unable to do so.
 
 
 =head1 SEE ALSO
