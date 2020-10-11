@@ -1,3 +1,8 @@
+0.007   2020-10-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --extract-version (-V) to extract version.
+
+
 0.006   2020-10-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Extract distribution name from {META,MYMETA}.{json,yml},
