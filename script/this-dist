@@ -12,10 +12,17 @@ use Log::ger::Screen;
 
 use App::ThisDist 'this_dist';
 use Cwd;
+use Getopt::Long;
+
+my ($quiet, $extract_version);
+Getopt::Long::Configure("bundling", "no_ignore_case");
+GetOptions(
+    "quiet|q" => \$quiet,
+    "extract-version|V" => \$extract_version,
+);
 
 my $cwd = getcwd();
-my $dist = this_dist($cwd);
-my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
+my $dist = this_dist($cwd, $extract_version);
 
 if (defined $dist) {
     print $dist, "\n";

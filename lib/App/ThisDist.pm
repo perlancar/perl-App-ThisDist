@@ -45,6 +45,10 @@ sub this_dist {
                 if ($meta && ref $meta eq 'HASH' && defined $meta->{name}) {
                     $distname = $meta->{name};
                     log_debug "Got distname=$distname from distribution metadata $file";
+                    if (defined $meta->{version}) {
+                        $distver = $meta->{version};
+                        log_debug "Got distver=$distver from distribution metadata $file";
+                    }
                     last GUESS;
                 } else {
                     last;
@@ -61,6 +65,10 @@ sub this_dist {
                 if ($meta && ref $meta eq 'HASH' && defined $meta->{name}) {
                     $distname = $meta->{name};
                     log_debug "Got distname=$distname from distribution metadata $file";
+                    if (defined $meta->{version}) {
+                        $distver = $meta->{version};
+                        log_debug "Got distver=$distver from distribution metadata $file";
+                    }
                     last GUESS;
                 } else {
                     last;
@@ -75,6 +83,10 @@ sub this_dist {
             while ($content =~ /^\s*name\s*=\s*(.+)/mg) {
                 $distname = $1;
                 log_debug "Got distname=$distname from dist.ini";
+                if ($content =~ /^version\s*=\s*(.+)/m) {
+                    $distver = $1;
+                    log_debug "Got distver=$distver from dist.ini";
+                }
                 last GUESS;
             }
         }
@@ -93,6 +105,10 @@ sub this_dist {
             }
             $distname = $1;
             log_debug "Got distname=$distname from Makefile.PL";
+            if ($content =~ /["']VERSION["']\s*=>\s*["'](.+?)["']/) {
+                $distver = $1;
+                log_debug "Got distver=$distver from Makefile.PL";
+            }
             last GUESS;
         }
 
@@ -109,7 +125,11 @@ sub this_dist {
                 last;
             }
             $distname = $1;
-            log_debug "Got distname=$distname from Makefile.PL";
+            log_debug "Got distname=$distname from Makefile";
+            if ($content =~ /^VERSION\s*=\s*(.+)/m) {
+                $distver = $1;
+                log_debug "Got distver=$distver from Makefile";
+            }
             last GUESS;
         }
 
@@ -127,10 +147,11 @@ sub this_dist {
             }
             $distname = $1; $distname =~ s/::/-/g;
             log_debug "Got distname=$distname from Build.PL";
+            # XXX extract version?
             last GUESS;
         }
 
-        # Build script does not contain dist name
+        # note: Build script does not contain dist name
 
       FROM_GIT_CONFIG: {
             last unless -f ".git/config";
@@ -143,6 +164,7 @@ sub this_dist {
                 my $res = CPAN::Dist::FromURL::extract_cpan_dist_from_url($url);
                 if (defined $distname) {
                     log_debug "Guessed distname=$distname from .git/config URL '$url'";
+                    # XXX extract version?
                     last GUESS;
                 }
             }
@@ -155,6 +177,7 @@ sub this_dist {
             if (defined $res) {
                 $distname = $res;
                 log_debug "Guessed distname=$distname from repo name '$dir_basename'";
+                # XXX extract version?
                 last GUESS;
             }
         }
