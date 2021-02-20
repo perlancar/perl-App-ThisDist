@@ -89,10 +89,6 @@ with current directory:
 =back
 
 
-=head1 FAQ
+=head1 SEE ALSO
 
-=head2 Where is this-mod?
-
-For now you can use L<dist2mod>:
-
- % this-dist | dist2mod
+L<this-mod>

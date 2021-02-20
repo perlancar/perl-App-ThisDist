@@ -1,0 +1,41 @@
+#!perl
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use IPC::System::Options qw(readpipe);
+
+my $res = readpipe("this-dist", @ARGV);
+exit 1 if $?;
+$res =~ s/-/::/g;
+print $res;
+exit 0;
+
+# ABSTRACT: Return name of Perl module associated with the current directory
+# PODNAME:
+
+=head1 SYNOPSIS
+
+Use like you would L<this-dist>:
+
+ % pwd
+ /home/budi/perl-Foo-Bar
+
+ % this-mod
+ Foo::Bar
+
+
+=head1 DESCRIPTION
+
+This script is a wrapper to L<this-dist>, converting the result like C<Foo-Bar> into C<Foo::Bar>.
+
+
+=head1 SEE ALSO
+
+L<this-dist>
