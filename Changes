@@ -1,3 +1,8 @@
+0.008   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: this-mod.
+
+
 0.007   2020-10-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --extract-version (-V) to extract version.
