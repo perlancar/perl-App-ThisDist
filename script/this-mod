@@ -30,12 +30,28 @@ Use like you would L<this-dist>:
  % this-mod
  Foo::Bar
 
+=head2 Some recipes
+
+Show L<MetaCPAN|https://metacpan.org> module documentation page in browser
+(requires L<lcpan> from L<App::lcpan>). (But note that for this particular task,
+I have also written L<this-mod-on-metacpan>.)
+
+ % lcpan metacpan-mod `this-mod`
+
+Same thing, but without using any other script:
+
+ % firefox https://metacpan.org/pod/`this-mod`
+
+
 
 =head1 DESCRIPTION
 
-This script is a wrapper to L<this-dist>, converting the result like C<Foo-Bar> into C<Foo::Bar>.
+This script is a wrapper to L<this-dist>, converting the result like C<Foo-Bar>
+into C<Foo::Bar>.
 
 
 =head1 SEE ALSO
 
 L<this-dist>
+
+L<this-mod-on-metacpan>
