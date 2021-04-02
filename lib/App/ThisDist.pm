@@ -207,7 +207,7 @@ Usage:
 
 If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
-version and will return "?" when unable to do so.
+version and will return "?" for version when version cannot be found.
 
 
 =head1 SEE ALSO
