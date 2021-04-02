@@ -42,6 +42,9 @@ Same thing, but without using any other script:
 
  % firefox https://metacpan.org/pod/`this-mod`
 
+(Re)install this module using L<cpanminus|App::cpanminus>:
+
+ % cpanm -n --reinstall `this-mod`
 
 
 =head1 DESCRIPTION
