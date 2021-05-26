@@ -63,17 +63,10 @@ if (defined $dist) {
  % this-dist -V
  Foo-Bar 1.23
 
-=head2 Some recipes
+Some other examples:
 
-Show L<MetaCPAN|https://metacpan.org> distribution page in browser (requires
-L<lcpan> from L<App::lcpan>). (But note that for this particular task, I have
-also written L<this-dist-on-metacpan>.)
-
- % lcpan metacpan-dist `this-dist`
-
-Same thing, but without using any other script:
-
- % firefox https://metacpan.org/release/`this-dist`
+ # Show MetaCPAN distribution page in browser (but see this-dist-on-metacpan script)
+ % firefox metacpan.org/release/`this-dist`
 
 
 =head1 DESCRIPTION

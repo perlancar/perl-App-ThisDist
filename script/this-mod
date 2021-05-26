@@ -22,28 +22,23 @@ exit 0;
 
 =head1 SYNOPSIS
 
-Use like you would L<this-dist>:
-
  % pwd
  /home/budi/perl-Foo-Bar
 
  % this-mod
  Foo::Bar
 
-=head2 Some recipes
+Some common usage:
 
-Show L<MetaCPAN|https://metacpan.org> module documentation page in browser
-(requires L<lcpan> from L<App::lcpan>). (But note that for this particular task,
-I have also written L<this-mod-on-metacpan>.)
+ # read documentation about the current module
+ % man `this-mod`
 
- % lcpan metacpan-mod `this-mod`
+ # open documentation abut the current module on MetaCPAN (but see this-mod-on-metacpan script)
+ % firefox metacpan.org/pod/`this-mod`
 
-Same thing, but without using any other script:
+Some other examples:
 
- % firefox https://metacpan.org/pod/`this-mod`
-
-(Re)install this module using L<cpanminus|App::cpanminus>:
-
+ # (Re)install this module using L<cpanminus|App::cpanminus>:
  % cpanm -n --reinstall `this-mod`
 
 
