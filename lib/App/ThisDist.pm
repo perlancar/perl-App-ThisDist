@@ -187,6 +187,13 @@ sub this_dist {
     $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
 }
 
+sub this_mod {
+    my $res = this_dist(@_);
+    return $res unless defined $res && $res =~ /\S/;
+    $res =~ s/-/::/g;
+    $res;
+}
+
 1;
 # ABSTRACT: Print Perl {distribution,module,author,...} associated with current directory
 
@@ -208,6 +215,11 @@ Usage:
 If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
 version and will return "?" for version when version cannot be found.
+
+=head2 this_mod
+
+A thin wrapper for L</this_dist>. It just converts "-" in the result to "::", so
+"Foo-Bar" becomes "Foo::Bar".
 
 
 =head1 SEE ALSO
