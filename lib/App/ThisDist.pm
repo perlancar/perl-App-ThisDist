@@ -1,18 +1,18 @@
 package App::ThisDist;
 
+use strict;
+use warnings;
+use Log::ger;
+
+use Exporter qw(import);
+use File::chdir;
+
 # AUTHORITY
 # DATE
 # DIST
 # VERSION
 
-use strict;
-use warnings;
-use Log::ger;
-
-use File::chdir;
-
-use Exporter qw(import);
-our @EXPORT_OK = qw(this_dist);
+our @EXPORT_OK = qw(this_dist this_mod);
 
 sub this_dist {
     require File::Slurper;
