@@ -89,6 +89,13 @@ with current directory:
 =back
 
 
+=head1 OPTIONS
+
+=head2 --quiet, -q
+
+=head2 --extract-version, -V
+
+
 =head1 SEE ALSO
 
 L<this-mod>
