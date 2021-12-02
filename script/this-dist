@@ -82,12 +82,11 @@ with current directory:
 
 =item * Name in F<dist.ini> (L<Dist::Zilla> configuration file), if the file is available
 
-=item * L<CPAN::Info::FromURL> against URLs in F<.git/config> (git repository configuration file), if the file is available
-
-=item * L<CPAN::Dist::FromRepoName> against current directory name
-
 =back
 
+To determine if a directory "looks like the top-level directory of a Perl
+distribution", it checks whether one of these files/directories are present:
+C<t>,
 
 =head1 OPTIONS
 

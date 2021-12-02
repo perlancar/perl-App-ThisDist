@@ -154,6 +154,7 @@ sub this_dist {
         # note: Build script does not contain dist name
 
       FROM_GIT_CONFIG: {
+            last; # currently disabled
             last unless -f ".git/config";
             log_debug "Found .git/config";
             my $content = File::Slurper::read_text(".git/config");
@@ -171,6 +172,7 @@ sub this_dist {
         }
 
       FROM_REPO_NAME: {
+            last; # currently disabled
             log_debug "Using CPAN::Dist::FromRepoName to guess from dir name ...";
             require CPAN::Dist::FromRepoName;
             my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($dir_basename);
