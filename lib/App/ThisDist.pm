@@ -1,18 +1,18 @@
 package App::ThisDist;
 
+use strict;
+use warnings;
+use Log::ger;
+
+use Exporter qw(import);
+use File::chdir;
+
 # AUTHORITY
 # DATE
 # DIST
 # VERSION
 
-use strict;
-use warnings;
-use Log::ger;
-
-use File::chdir;
-
-use Exporter qw(import);
-our @EXPORT_OK = qw(this_dist);
+our @EXPORT_OK = qw(this_dist this_mod);
 
 sub this_dist {
     require File::Slurper;
@@ -154,6 +154,7 @@ sub this_dist {
         # note: Build script does not contain dist name
 
       FROM_GIT_CONFIG: {
+            last; # currently disabled
             last unless -f ".git/config";
             log_debug "Found .git/config";
             my $content = File::Slurper::read_text(".git/config");
@@ -171,6 +172,7 @@ sub this_dist {
         }
 
       FROM_REPO_NAME: {
+            last; # currently disabled
             log_debug "Using CPAN::Dist::FromRepoName to guess from dir name ...";
             require CPAN::Dist::FromRepoName;
             my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($dir_basename);
@@ -185,6 +187,13 @@ sub this_dist {
         log_debug "Can't guess distribution, giving up";
     }
     $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
+}
+
+sub this_mod {
+    my $res = this_dist(@_);
+    return $res unless defined $res && $res =~ /\S/;
+    $res =~ s/-/::/g;
+    $res;
 }
 
 1;
@@ -208,6 +217,11 @@ Usage:
 If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
 version and will return "?" for version when version cannot be found.
+
+=head2 this_mod
+
+A thin wrapper for L</this_dist>. It just converts "-" in the result to "::", so
+"Foo-Bar" becomes "Foo::Bar".
 
 
 =head1 SEE ALSO

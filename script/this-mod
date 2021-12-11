@@ -1,21 +1,44 @@
 #!perl
 
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger::Screen;
+
+use App::ThisDist 'this_mod';
+use Cwd;
+use Getopt::Long;
+
 # AUTHORITY
 # DATE
 # DIST
 # VERSION
 
-use 5.010001;
-use strict;
-use warnings;
+my ($quiet, $namespace_prefix, $extract_version);
+Getopt::Long::Configure("bundling", "no_ignore_case");
+GetOptions(
+    "quiet|q" => \$quiet,
+    "namespace-prefix|n=s" => \$namespace_prefix,
+    "extract-version|V" => \$extract_version,
+);
 
-use IPC::System::Options qw(readpipe);
+my $cwd = getcwd();
+my $mod = this_mod($cwd, $extract_version);
 
-my $res = readpipe("this-dist", @ARGV);
-exit 1 if $?;
-$res =~ s/-/::/g;
-print $res;
-exit 0;
+if (defined $mod) {
+    if (defined $namespace_prefix && length $namespace_prefix) {
+        $namespace_prefix =~ s/::\z//;
+        $mod =~ s/\A\Q$namespace_prefix\E(?:::|\z)//i;
+    }
+    print $mod, "\n";
+} else {
+    if ($quiet) {
+    } else {
+        warn "this-mod: No perl module name can be associated with current directory '$cwd'\n";
+    }
+    exit 1;
+}
+
 
 # ABSTRACT: Return name of Perl module associated with the current directory
 # PODNAME:
@@ -41,11 +64,26 @@ Some other examples:
  # (Re)install this module using L<cpanminus|App::cpanminus>:
  % cpanm -n --reinstall `this-mod`
 
+ # remove namespace prefix
+ % cd repos/perl-Acme-CPANModules-Symlink
+ % cpanmodules ls-entries `this-mod -n Acme::CPANModules`
+
 
 =head1 DESCRIPTION
 
 This script is a wrapper to L<this-dist>, converting the result like C<Foo-Bar>
 into C<Foo::Bar>.
+
+
+=head1 OPTIONS
+
+=head2 --quiet, -q
+
+=head2 --extract-version, -V
+
+=head2 --namespace-prefix, -n
+
+Remove the specified namespace prefix.
 
 
 =head1 SEE ALSO
