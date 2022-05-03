@@ -15,6 +15,7 @@ use Getopt::Long;
 # VERSION
 
 my ($quiet, $namespace_prefix, $extract_version);
+$namespace_prefix = $ENV{PERL_THIS_MOD_NAMESPACE_PREFIX};
 Getopt::Long::Configure("bundling", "no_ignore_case");
 GetOptions(
     "quiet|q" => \$quiet,
@@ -84,6 +85,13 @@ into C<Foo::Bar>.
 =head2 --namespace-prefix, -n
 
 Remove the specified namespace prefix.
+
+
+=head1 ENVIRONMENT
+
+=head2 PERL_THIS_MOD_NAMESPACE_PREFIX
+
+String. Set default for C<--namespace-prefix> option.
 
 
 =head1 SEE ALSO
