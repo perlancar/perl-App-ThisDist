@@ -84,9 +84,10 @@ with current directory:
 
 =back
 
-To determine if a directory "looks like the top-level directory of a Perl
-distribution", it checks whether one of these files/directories are present:
-C<t>,
+If it cannot find an associated Perl
+distribution name, it will print an error message to stderr (unless being told
+to be quiet via C<--quiet>) and exit with non-zero status.
+
 
 =head1 OPTIONS
 
