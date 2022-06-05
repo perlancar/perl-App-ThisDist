@@ -101,3 +101,13 @@ to be quiet via C<--quiet>) and exit with non-zero status.
 L<this-mod>
 
 L<this-dist-on-metacpan>
+
+Some scripts like L<pmman> and L<pmpath> (from L<App::PMUtils>) or
+L<list-dist-contents> and L<dist-has-deb> (from L<App::DistUtils>) already
+default to "current module" or "current distribution" so instead of saying:
+
+ % dist-has-deb `this-dist`
+
+you can just say:
+
+ % dist-has-deb

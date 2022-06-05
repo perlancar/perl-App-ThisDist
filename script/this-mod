@@ -114,3 +114,13 @@ String. Set default for C<--namespace-prefix> option.
 L<this-dist>
 
 L<this-mod-on-metacpan>
+
+Some scripts like L<pmman> and L<pmpath> (from L<App::PMUtils>) or
+L<list-dist-contents> and L<dist-has-deb> (from L<App::DistUtils>) already
+default to "current module" or "current distribution" so instead of saying:
+
+ % pmman `this-mod`
+
+you can just say:
+
+ % pmman
