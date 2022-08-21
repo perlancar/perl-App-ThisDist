@@ -231,3 +231,7 @@ Debugging statement are logged using L<Log::ger>.
 =head1 SEE ALSO
 
 L<App::DistUtils>
+
+C<my_dist()> from L<Dist::Util::Current> tries to guess distribution name
+associated with source code file. It uses us when guessing via C<$DIST> or
+F<.packlist> files fail.
