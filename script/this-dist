@@ -96,6 +96,13 @@ to be quiet via C<--quiet>) and exit with non-zero status.
 =head2 --extract-version, -V
 
 
+=head1 ENVIRONMENT
+
+=head2 DEBUG
+
+Bool. If set to true, will print debugging statement to stderr.
+
+
 =head1 SEE ALSO
 
 L<this-mod>

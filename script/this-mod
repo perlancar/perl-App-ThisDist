@@ -104,6 +104,10 @@ Remove the specified namespace prefix.
 
 =head1 ENVIRONMENT
 
+=head2 DEBUG
+
+Bool. If set to true, will print debugging statement to stderr.
+
 =head2 PERL_THIS_MOD_NAMESPACE_PREFIX
 
 String. Set default for C<--namespace-prefix> option.

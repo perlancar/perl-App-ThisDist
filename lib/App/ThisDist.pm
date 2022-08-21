@@ -218,10 +218,14 @@ If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
 version and will return "?" for version when version cannot be found.
 
+Debugging statement are logged using L<Log::ger>.
+
 =head2 this_mod
 
 A thin wrapper for L</this_dist>. It just converts "-" in the result to "::", so
 "Foo-Bar" becomes "Foo::Bar".
+
+Debugging statement are logged using L<Log::ger>.
 
 
 =head1 SEE ALSO
