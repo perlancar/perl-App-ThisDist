@@ -115,6 +115,8 @@ String. Set default for C<--namespace-prefix> option.
 
 =head1 SEE ALSO
 
+L<dir2mod>
+
 L<this-dist>
 
 L<this-mod-on-metacpan>

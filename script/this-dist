@@ -105,6 +105,8 @@ Bool. If set to true, will print debugging statement to stderr.
 
 =head1 SEE ALSO
 
+L<dir2dist>
+
 L<this-mod>
 
 L<this-dist-on-metacpan>
