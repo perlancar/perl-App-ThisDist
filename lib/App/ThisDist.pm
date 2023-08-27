@@ -171,7 +171,7 @@ sub this_dist {
             }
         }
 
-      FROM_REPO_NAME: {
+      __DISABLED__FROM_REPO_NAME: {
             last; # currently disabled
             log_debug "Using CPAN::Dist::FromRepoName to guess from dir name ...";
             require CPAN::Dist::FromRepoName;
@@ -182,6 +182,27 @@ sub this_dist {
                 # XXX extract version?
                 last GUESS;
             }
+        }
+
+      FROM_ARCHIVE: {
+            require Filename::Perl::Release;
+            # if there is a single archive in the directory which looks like a
+            # perl release, use that.
+            my @files = grep { -f } glob "*";
+            my ($distfile, $dist, $ver);
+            for my $file (@files) {
+                my $res = Filename::Perl::Release::check_perl_release_filename(filename=>$file);
+                next unless $res;
+                last FROM_ARCHIVE if defined $dist;
+                $dist = $res->{distribution};
+                $ver  = $res->{version};
+                $distfile = $file;
+            }
+            last unless defined $dist;
+            $distname = $dist;
+            $distver  = $ver;
+            log_debug "Guessed distname=$distname from a single perl archive file in the directory ($distfile)";
+            last GUESS;
         }
 
         log_debug "Can't guess distribution, giving up";
