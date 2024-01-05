@@ -1,3 +1,9 @@
+0.022   2024-01-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add third argument $detail? to instruct to return a hash or more
+          detailed information.
+
+
 0.021   2024-01-05  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
