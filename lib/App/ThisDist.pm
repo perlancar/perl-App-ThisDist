@@ -17,7 +17,7 @@ our @EXPORT_OK = qw(this_dist this_mod);
 sub this_dist {
     require File::Slurper;
 
-    my ($dir, $extract_version) = @_;
+    my ($dir, $extract_version, $detail) = @_;
 
     if (defined $dir) {
         log_debug "chdir to $dir ...";
@@ -32,7 +32,8 @@ sub this_dist {
 
     (my $dir_basename = $dir) =~ s!.+[/\\]!!;
 
-    my ($distname, $distver);
+    my ($distname, $distver, $detailinfo);
+    $detailinfo = {};
 
   GUESS: {
       FROM_DISTMETA_2: {
@@ -45,6 +46,8 @@ sub this_dist {
                 if ($meta && ref $meta eq 'HASH' && defined $meta->{name}) {
                     $distname = $meta->{name};
                     log_debug "Got distname=$distname from distribution metadata $file";
+                    $detailinfo->{source} = 'dist meta v2';
+                    $detailinfo->{dist_meta_file} = $file;
                     if (defined $meta->{version}) {
                         $distver = $meta->{version};
                         log_debug "Got distver=$distver from distribution metadata $file";
@@ -65,6 +68,8 @@ sub this_dist {
                 if ($meta && ref $meta eq 'HASH' && defined $meta->{name}) {
                     $distname = $meta->{name};
                     log_debug "Got distname=$distname from distribution metadata $file";
+                    $detailinfo->{source} = 'dist meta v1.1';
+                    $detailinfo->{dist_meta_file} = $file;
                     if (defined $meta->{version}) {
                         $distver = $meta->{version};
                         log_debug "Got distver=$distver from distribution metadata $file";
@@ -83,6 +88,7 @@ sub this_dist {
             while ($content =~ /^\s*name\s*=\s*(.+)/mg) {
                 $distname = $1;
                 log_debug "Got distname=$distname from dist.ini";
+                $detailinfo->{source} = "dist.ini";
                 if ($content =~ /^version\s*=\s*(.+)/m) {
                     $distver = $1;
                     log_debug "Got distver=$distver from dist.ini";
@@ -105,6 +111,7 @@ sub this_dist {
             }
             $distname = $1;
             log_debug "Got distname=$distname from Makefile.PL";
+            $detailinfo->{source} = "Makefile.PL";
             if ($content =~ /["']VERSION["']\s*=>\s*["'](.+?)["']/) {
                 $distver = $1;
                 log_debug "Got distver=$distver from Makefile.PL";
@@ -126,6 +133,7 @@ sub this_dist {
             }
             $distname = $1;
             log_debug "Got distname=$distname from Makefile";
+            $detailinfo->{source} = "Makefile";
             if ($content =~ /^VERSION\s*=\s*(.+)/m) {
                 $distver = $1;
                 log_debug "Got distver=$distver from Makefile";
@@ -147,6 +155,7 @@ sub this_dist {
             }
             $distname = $1; $distname =~ s/::/-/g;
             log_debug "Got distname=$distname from Build.PL";
+            $detailinfo->{source} = "Build.PL";
             # XXX extract version?
             last GUESS;
         }
@@ -165,6 +174,7 @@ sub this_dist {
                 my $res = CPAN::Dist::FromURL::extract_cpan_dist_from_url($url);
                 if (defined $distname) {
                     log_debug "Guessed distname=$distname from .git/config URL '$url'";
+                    $detailinfo->{source} = "git config";
                     # XXX extract version?
                     last GUESS;
                 }
@@ -179,6 +189,7 @@ sub this_dist {
             if (defined $res) {
                 $distname = $res;
                 log_debug "Guessed distname=$distname from repo name '$dir_basename'";
+                $detailinfo->{source} = "repo name";
                 # XXX extract version?
                 last GUESS;
             }
@@ -202,18 +213,33 @@ sub this_dist {
             $distname = $dist;
             $distver  = $ver;
             log_debug "Guessed distname=$distname from a single perl archive file in the directory ($distfile)";
+            $detailinfo->{source} = "archive";
+            $detailinfo->{archive_file} = $distfile;
             last GUESS;
         }
 
         log_debug "Can't guess distribution, giving up";
+    } # GUESS
+
+    if ($detail) {
+        $detailinfo->{dist} = $distname;
+        $detailinfo->{dist_version} = $distver;
+        $detailinfo;
+    } else {
+        $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
     }
-    $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
 }
 
 sub this_mod {
     my $res = this_dist(@_);
-    return $res unless defined $res && $res =~ /\S/;
-    $res =~ s/-/::/g;
+    return $res unless defined $res;
+    if (ref $res) {
+        return $res unless $res->{dist} && $res->{dist} =~ /\S/;
+        ($res->{module} = $res->{dist}) =~ s/-/::/g;
+    } else {
+        return $res unless $res =~ /\S/;
+        $res =~ s/-/::/g;
+    }
     $res;
 }
 
@@ -233,11 +259,13 @@ See included scripts:
 
 Usage:
 
- my $dist = this_dist([ $dir ] [ , $extract_version? ]); => e.g. "App-Foo" or "App-Foo 1.23"
+ my $dist = this_dist([ $dir ] [ , $extract_version? ] [ , $detail? ]); => e.g. "App-Foo" or "App-Foo 1.23" or {dist=>"App-Foo", dist_version=>1.23, ...}
 
 If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
-version and will return "?" for version when version cannot be found.
+version and will return "?" for version when version cannot be found. If
+C<$detail> is set to true, then instead of just a string, will return a hash of
+more detailed information.
 
 Debugging statement are logged using L<Log::ger>.
 
