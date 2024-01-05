@@ -18,3 +18,5 @@ This is an empty module to let users find App::ThisDist more easily.
 =head1 SEE ALSO
 
 L<App::ThisDist>
+
+L<this_mod> uses us.
