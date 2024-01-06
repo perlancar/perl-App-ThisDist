@@ -226,6 +226,7 @@ sub this_dist {
         $detailinfo->{dist_version} = $distver;
         $detailinfo;
     } else {
+        return undef unless defined $distname;
         $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
     }
 }
