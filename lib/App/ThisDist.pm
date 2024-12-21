@@ -196,13 +196,13 @@ sub this_dist {
         }
 
       FROM_ARCHIVE: {
-            require Filename::Perl::Release;
+            require Filename::Type::Perl::Release;
             # if there is a single archive in the directory which looks like a
             # perl release, use that.
             my @files = grep { -f } glob "*";
             my ($distfile, $dist, $ver);
             for my $file (@files) {
-                my $res = Filename::Perl::Release::check_perl_release_filename(filename=>$file);
+                my $res = Filename::Type::Perl::Release::check_perl_release_filename(filename=>$file);
                 next unless $res;
                 last FROM_ARCHIVE if defined $dist;
                 $dist = $res->{distribution};
